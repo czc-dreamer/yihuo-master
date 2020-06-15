@@ -1,0 +1,449 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+    <title>乐优商城--商品详情页</title>
+    <link rel="icon" href="/assets/img/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="/css/webbase.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/pages-item.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/pages-zoom.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/widget-cartPanelView.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/test.css"/>
+    <style type="text/css">
+        .goods-intro-list li {
+            display: inline-block;
+            width: 300px;
+        }
+
+        .Ptable {
+            margin: 10px 0;
+        }
+
+        .Ptable-item {
+            padding: 12px 0;
+            line-height: 220%;
+            color: #999;
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .Ptable-item h3 {
+            width: 110px;
+            text-align: right;
+        }
+
+        .Ptable-item h3, .package-list h3 {
+            font-weight: 400;
+            font-size: 12px;
+            float: left;
+        }
+
+        h3 {
+            display: block;
+            font-size: 1.17em;
+            -webkit-margin-before: 1em;
+            -webkit-margin-after: 1em;
+            -webkit-margin-start: 0px;
+            -webkit-margin-end: 0px;
+            font-weight: bold;
+        }
+
+        .Ptable-item dl {
+            margin-left: 110px;
+        }
+
+        dl {
+            display: block;
+            -webkit-margin-before: 1em;
+            -webkit-margin-after: 1em;
+            -webkit-margin-start: 0px;
+            -webkit-margin-end: 0px;
+        }
+
+        .Ptable-item dt {
+            width: 160px;
+            float: left;
+            text-align: right;
+            padding-right: 5px;
+        }
+
+        .Ptable-item dd {
+            margin-left: 210px;
+        }
+
+        dd {
+            display: block;
+            -webkit-margin-start: 40px;
+        }
+
+        .package-list {
+            padding: 12px 0;
+            line-height: 220%;
+            color: #999;
+            font-size: 12px;
+            margin-top: -1px;
+        }
+
+        .package-list h3 {
+            width: 130px;
+            text-align: right;
+        }
+
+        .package-list p {
+            margin-left: 155px;
+            padding-right: 50px;
+        }
+    </style>
+    <script th:inline="javascript">
+
+        // sku集合
+        const skus = /*[[${skus}]]*/ [];
+
+        //userInfo集合
+        const userInfo =/*[[${userInfo}]]*/ [];
+    </script>
+</head>
+
+<body>
+
+<!-- 头部栏位 -->
+<!--页面顶部，由js动态加载-->
+<div id="itemApp">
+    <div id="nav-bottom">
+        <yh-top/>
+    </div>
+    <div class="py-container">
+        <div id="item">
+            <div class="crumb-wrap">
+                <ul class="sui-breadcrumb">
+                    <li th:each="category :${categories}">
+                        <a href="#" th:text="${category.name}">手机</a>
+                    </li>
+                    <li class="active" th:text="${spu.title}">Apple iPhone 6s</li>
+                </ul>
+            </div>
+            <!--product-info-->
+            <div class="product-info">
+                <div class="fl preview-wrap">
+                    <!--放大镜效果-->
+                    <div class="zoom">
+                        <!--默认第一个预览-->
+                        <div id="preview" class="spec-preview">
+							<span class="jqzoom">
+								<img :jqimg="images[0]" :src="images[0]" width="400px" height="400px"/>
+							</span>
+                        </div>
+                        <!--下方的缩略图-->
+                        <div class="spec-scroll">
+                            <a class="prev">&lt;</a>
+                            <!--左右按钮-->
+                            <div class="items">
+                                <ul>
+                                    <li v-for="(image,i) in images" :key="i">
+                                        <img :src="image" :bimg="image" onmousemove="preview(this)"/>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a class="next">&gt;</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="fr itemInfo-wrap">
+                    <div class="sku-name">
+                        <h2>{{sku.title}}</h2>
+                    </div>
+                    <!--					<div class="news"><span th:utext="${spu.title}"></span></div>-->
+                    <div class="summary">
+                        <div class="summary-wrap">
+                            <div class="fl title"><i>价　　格</i></div>
+                            <div class="fl price">
+                                <i>¥</i><em>{{yh.formatPrice(sku.sell_price)}}</em>
+                            </div>
+                        </div>
+                        <div class="summary-wrap">
+                            <div class="fl title" style="color: grey"><i>原 价</i></div>
+                            <div class="fl ">
+                                <i>¥</i><em style="color: grey;font-size: 120%">{{yh.formatPrice(sku.buy_price)}}</em>
+                            </div>
+                        </div>
+                        <div class="summary-wrap">
+                            <div class="fl title"><i>发布时间</i></div>
+                            <div class="fl">
+                                <em>{{yh.formatDate(sku.create_time)}}</em>
+                            </div>
+                        </div>
+                        <div class="summary-wrap">
+                            <div class="fl title"><i>卖家</i></div>
+                            <em>{{user.username}}</em>
+                        </div>
+                        <div class="summary-wrap">
+                            <input type="button" value="联系卖家" @click="contract()"
+                                   style="width: 140px;height: 50px;color: green"/>
+                        </div>
+                        <div class="summary-wrap">
+                            <div class="fl title">
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <input autocomplete="off" type="text" v-model="num" disabled value="1"
+                                               minnum="1" class="itxt"/>
+                                        <a href="javascript:void(0)" class="increment plus" @click="increment">+</a>
+                                        <a href="javascript:void(0)" class="increment mins" @click="decrement">-</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fl">
+                                <ul class="btn-choose unstyled">
+                                    <li>
+                                        <a @click="addCart()" target="_blank" class="sui-btn  btn-danger addshopcar">加入购物车</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--物品评论开始-->
+    <div class="comments want-comments" style="width:98.5%">
+        <div class="comments-wr" style="border-left:0px;">
+            <div class="comment-wr">
+                <div class="post-comment clearfix">
+                    <!--已登录状态下-->
+                    <img class="avatar" :src=this.user.head alt="头像"/>
+                    <div class="commenting want-commenting clearfix" v-if="showComment">
+                        <div class="comment-input-wr-wr" style="margin-right:56px;">
+                            <div class="comment-input-wr">
+                                        <textarea class="comment-input-wr" name="comment-input"
+                                                  id="comment-content" v-model="content"></textarea>
+                            </div>
+                        </div>
+                        <button class="sub-comment" type="button" id="submit-comment-btn" data-reply="0"
+                                data-reply-content="0" @click="comment_submit">评论
+                        </button>
+                    </div>
+                    <!--未登录状态下-->
+<!--                    <img class="avatar" src="./img/avatar-unlogin.png" alt="头像"/>-->
+                    <div class="commenting-unlogin want-commenting clearfix" v-else>
+                        <div class="comment-input-wr-wr">
+                            <div class="comment-input-wr">
+                                <span class="tips">评论总要登录留个名吧</span>
+                            </div>
+                        </div>
+                        <button class="comment-login" data-type="l" id="to-login-btn" @click="comment_login">登录</button>
+                    </div>
+                    <!--已有的评论列表-->
+                    <div class="comments want-comments" style="width:98.5%;margin-top:10px;padding-top:0px;"
+                         v-if="commentList" >
+                        <div class="comments-wr" style="border:0px;" v-for="comments in commentList">
+                            <div class="comment-wr">
+                                <div class="comment" style="margin-top:25px;">
+                                    <img class="avatar" :src=comments.head
+                                         alt="头像"/>
+
+                                    <div class="commentator"
+                                         style="padding-left:55px;padding-bottom:5px;color:rgb(75, 192, 165);border-bottom: 1px dashed rgb(75, 192, 165);">
+                                        <b>{{comments.username}}</b>
+                                        <span class="rpy-to" v-if="comments.reply_to">{{comments.reply_to}}</span>
+                                    </div>
+                                    <p class="comment"
+                                       style="padding-left:55px;padding-bottom:5px;padding-top:5px;">
+                                        {{comments.content}}<font
+                                            style="float:right;">{{formatDate(comments.create_time)}}</font></p>
+                                    <div class="man" style="padding-left:55px;padding-bottom:5px;">
+                                        <a class="rpl" href="#comment-content"
+                                           @click="reply(comments.content,comments.username)">回复</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--物品评论结束-->
+
+</div>
+<script src="/js/vue/vue.js"></script>
+<script src="/js/axios.min.js"></script>
+<script src="/js/common.js"></script>
+
+<script>
+    var itemVm = new Vue({
+        el: "#itemApp",
+        data: {
+            yh,
+            skus,
+            commentList:[],
+            userInfo,
+            num: 1,
+            showComment: false,
+            content: '',
+            userHead:'',
+            username:''
+        },
+        computed: {
+            sku() {
+                // const index = Object.values(this.index).join("-");
+                return this.skus[0];
+            },
+            images() {
+                return this.sku.image ? this.sku.image.split(",") : [''];
+            },
+            user() {
+                return this.userInfo[0];
+            },
+        },
+        created() {
+            this.comment_repyh();
+            this.loadComment();
+        },
+        components: {
+            yhTop: () => import('/js/pages/top.js')
+        },
+        methods: {
+            increment() {
+                this.num++;
+            },
+            decrement() {
+                if (this.num > 1) {
+                    this.num--;
+                }
+            },
+            addCart() {
+                yh.verifyUser().then(res => {
+                    //已经登录发送消息到后台，保存到redis中
+                    yh.http.post("/cart", {skuId: this.sku.id, num: this.num}).then(res => {
+
+                        window.location = "http://www.yihuo.com/cart.html";
+                    })
+                }).catch(() => {
+                    //未登录保存在浏览器本地localStorage中
+                    //1.查询本地购物车
+                    let carts = yh.store.get("carts") || [];
+                    let cart = carts.find(c => c.skuId === this.sku.id);
+                    //2.判断是否存在
+                    if (cart) {
+                        //3.存在更新数量
+                        cart.num += this.num;
+                    } else {
+                        //4.不存在，新增
+                        cart = {
+                            skuId: this.sku.id,
+                            title: this.sku.title,
+                            price: this.sku.price,
+                            image: this.sku.images,
+                            num: this.num,
+                        };
+                        carts.push(cart);
+                    }
+                    //5.把carts写回到localStorage
+                    yh.store.set("carts", carts);
+                    //6.跳转
+                    window.location.href = "http://www.yihuo.com/cart.html";
+                });
+            },
+            comment_login() {
+                this.gotoLogin();
+            },
+            gotoLogin() {
+                window.location = "login.html?returnUrl=" + window.location;
+            },
+            comment_submit() {
+                var content = $("#comment-content").val();
+                if (content == '') {
+                    alert('请输入评论内容！');
+                    return;
+                }
+                console.log("tuh:"+this.userHead)
+                var data = {'goods_id': this.sku.id, 'content': content, 'user_id': this.user.id,'username':this.username,'head':this.userHead};
+                if ($("#submit-comment-btn").attr('data-reply') != '0') {
+                    data.reply_to = $("#submit-comment-btn").attr('data-reply');
+                    data.content = data.content.replace('回复：' + data.replyTo + ':', '')
+                    data.content = '回复：“' + $("#submit-comment-btn").attr('data-reply-content') + '”<br>' + data.content;
+                }
+                $.ajax({
+                    type: 'post',
+                    url: "http://api.yihuo.com/api/item/comment",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function () {
+                        alert('评论成功');
+                        window.location.reload();
+                    }
+                });
+            },
+            reply(content, username) {
+
+console.log("un:"+username)
+                $("#comment-content").val('回复：' + username + ':')
+                $("#submit-comment-btn").attr('data-reply', username)
+                $("#submit-comment-btn").attr('data-reply-content', content)
+            },
+            comment_repyh() {
+                //1.先判断登录状态
+                yh.verifyUser().then(res => {
+                    this.showComment=true
+                    //2.已经登录
+                    yh.http.get("/user/queryUserInfo/" + res.data.id).then((UInfo) => {
+
+                        var obj = UInfo.data
+                        console.log(obj)
+                        this.userHead = obj[0].head
+                        console.log("uh:"+this.userHead)
+                        this.username=obj[0].username
+                    })
+                }).catch(() => {
+                    //3.未登陆
+                    console.log("请先登录")
+
+                })
+            },
+            contract() {
+                alert("卖家姓名：" + this.user.username,
+                    "联系电话：" + this.user.phone)
+            },
+            loadComment() {
+                yh.http.get("/item/comment/" + this.sku.id).then((data) => {
+                    console.log("cInfo:" + data)
+                    this.commentList = data.data;
+
+                })
+            },
+
+            formatDate: yh.formatDate,
+        }
+    });
+</script>
+
+<script type="text/javascript" src="/js/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#service").hover(function () {
+            $(".service").show();
+        }, function () {
+            $(".service").hide();
+        });
+        $("#shopcar").hover(function () {
+            $("#shopcarlist").show();
+        }, function () {
+            $("#shopcarlist").hide();
+        });
+
+    })
+</script>
+<script type="text/javascript" src="/js/model/cartModel.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery.easing/jquery.easing.min.js"></script>
+<script type="text/javascript" src="/js/plugins/sui/sui.min.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery.jqzoom/jquery.jqzoom.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery.jqzoom/zoom.js"></script>
+<script type="text/javascript" src="index/index.js"></script>
+</body>
+
+</html>

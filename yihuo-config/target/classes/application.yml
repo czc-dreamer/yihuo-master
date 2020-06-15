@@ -1,0 +1,22 @@
+server:
+  port: 10011
+spring:
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          searchLocations: /Users/chenzhaocun/myCode/校园二手/config-master
+  rabbitmq:
+    host: 192.168.80.168
+    username: yihuo
+    password: yihuo
+    virtual-host: /yihuo
+
+
+management: #暴露触发消息总线的地址
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh
